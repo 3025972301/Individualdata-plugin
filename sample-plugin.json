@@ -1,0 +1,17 @@
+{
+  "id": "sample-plugin",
+  "name": "示例插件",
+  "version": "1.0.0",
+  "description": "一个简单的演示插件，在控制台输出消息",
+  "type": "function",
+  "author": "demo",
+  "code": {
+    "js": "console.log('示例插件已加载')",
+    "css": "",
+    "template": ""
+  },
+  "dependencies": [],
+  "permissions": [],
+  "config": {},
+  "status": "inactive"
+}
