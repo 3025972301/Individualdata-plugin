@@ -1,0 +1,23 @@
+{
+  "id": "cat-paw-click-effect",
+  "name": "可爱猫抓点击特效",
+  "version": "1.0.0",
+  "description": "鼠标或触摸点击时显示可爱的猫抓印特效，支持多种猫爪样式和动画",
+  "type": "function",
+  "author": "cat-effect-dev",
+  "code": {
+    "js": "const CatPawClickEffect = { pawStyles: ['🐾', '🐈', '😸', '😺', '🐱'], colors: ['#ff6b9d', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6c5ce7'], init() { this.createPawEffect = this.createPawEffect.bind(this); document.addEventListener('click', this.createPawEffect); document.addEventListener('touchend', this.createPawEffect); console.log('猫抓点击特效已激活 🐾'); }, createPawEffect(e) { const x = e.type === 'touchend' ? (e.changedTouches[0].clientX || e.clientX) : e.clientX; const y = e.type === 'touchend' ? (e.changedTouches[0].clientY || e.clientY) : e.clientY; for (let i = 0; i < 3; i++) { setTimeout(() => { this.createSinglePaw(x, y, i); }, i * 100); } }, createSinglePaw(x, y, index) { const paw = document.createElement('div'); const pawStyle = this.pawStyles[Math.floor(Math.random() * this.pawStyles.length)]; const color = this.colors[Math.floor(Math.random() * this.colors.length)]; const angle = (index * 120) + Math.random() * 60 - 30; const distance = 30 + Math.random() * 40; const offsetX = Math.cos(angle * Math.PI / 180) * distance; const offsetY = Math.sin(angle * Math.PI / 180) * distance; paw.textContent = pawStyle; paw.style.cssText = `position: fixed; left: ${x}px; top: ${y}px; font-size: ${20 + Math.random() * 15}px; color: ${color}; pointer-events: none; z-index: 10000; transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); transform: translate(-50%, -50%) scale(0) rotate(0deg); text-shadow: 0 0 10px ${color}; user-select: none;`; document.body.appendChild(paw); requestAnimationFrame(() => { paw.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(1.2) rotate(${Math.random() * 360}deg)`; paw.style.opacity = '0'; }); setTimeout(() => { if (paw.parentNode) { paw.parentNode.removeChild(paw); } }, 800); }, destroy() { document.removeEventListener('click', this.createPawEffect); document.removeEventListener('touchend', this.createPawEffect); console.log('猫抓点击特效已停用'); } }; if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', () => CatPawClickEffect.init()); } else { CatPawClickEffect.init(); } window.CatPawClickEffect = CatPawClickEffect;",
+    "css": "@keyframes pawBounce { 0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; } 50% { transform: translate(-50%, -50%) scale(1.3) rotate(180deg); opacity: 0.8; } 100% { transform: translate(-50%, -50%) scale(0.8) rotate(360deg); opacity: 0; } } .cat-paw-effect { animation: pawBounce 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; filter: drop-shadow(0 0 8px currentColor); } .cat-paw-trail { position: absolute; width: 4px; height: 4px; background: radial-gradient(circle, currentColor 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9999; } @media (max-width: 768px) { .cat-paw-effect { font-size: 18px !important; } }",
+    "template": ""
+  },
+  "dependencies": [],
+  "permissions": [],
+  "config": {
+    "pawCount": 3,
+    "animationDuration": 800,
+    "maxDistance": 70,
+    "enableTrail": true,
+    "enableSound": false
+  },
+  "status": "inactive"
+}
