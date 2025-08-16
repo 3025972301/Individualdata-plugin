@@ -1,0 +1,17 @@
+{
+  "id": "liquid-glass-ios-pro",
+  "name": "iOS液态玻璃主题 Pro",
+  "version": "3.0.0",
+  "description": "优化后的液态玻璃主题，修复粉色块并提升性能，支持夜间模式与动态模糊",
+  "type": "theme",
+  "author": "ai-dev",
+  "code": {
+    "js": "const GlassPro = {\n  init() {\n    this.injectControl();\n    this.bindHover();\n  },\n  injectControl() {\n    const panel = document.createElement('div');\n    panel.id = 'glass-pro-panel';\n    panel.innerHTML = '<button id=\"glass-pro-dark\">🌙</button><input id=\"glass-pro-blur\" type=\"range\" min=\"0\" max=\"40\" value=\"20\" />';\n    panel.style.position = 'fixed';\n    panel.style.top = '10px';\n    panel.style.right = '10px';\n    panel.style.zIndex = '9999';\n    document.body.appendChild(panel);\n    document.getElementById('glass-pro-dark').addEventListener('click', () => {\n      document.body.classList.toggle('glass-dark-mode');\n    });\n    document.getElementById('glass-pro-blur').addEventListener('input', e => {\n      document.documentElement.style.setProperty('--glass-blur', e.target.value + 'px');\n    });\n  },\n  bindHover() {\n    let ticking = false;\n    document.addEventListener('mousemove', e => {\n      if (!ticking) {\n        window.requestAnimationFrame(() => {\n          document.documentElement.style.setProperty('--glass-pos-x', e.clientX + 'px');\n          document.documentElement.style.setProperty('--glass-pos-y', e.clientY + 'px');\n          ticking = false;\n        });\n        ticking = true;\n      }\n    });\n  }\n};\nif (document.readyState === 'loading') {\n  document.addEventListener('DOMContentLoaded', () => GlassPro.init());\n} else {\n  GlassPro.init();\n}\n",
+    "css": ":root {\n  --glass-blur: 20px;\n  --glass-bg-light: rgba(255,255,255,0.15);\n  --glass-bg-dark: rgba(0,0,0,0.25);\n  --glass-border-light: rgba(255,255,255,0.4);\n  --glass-border-dark: rgba(0,0,0,0.4);\n  --glass-pos-x: 50%;\n  --glass-pos-y: 50%;\n}\nbody {\n  background: var(--glass-bg-light);\n  backdrop-filter: blur(var(--glass-blur));\n  -webkit-backdrop-filter: blur(var(--glass-blur));\n  transition: backdrop-filter 0.3s ease;\n}\nbody::before {\n  content: '';\n  position: fixed;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  pointer-events: none;\n  background: radial-gradient(circle at var(--glass-pos-x) var(--glass-pos-y), rgba(255,255,255,0.3), transparent 70%);\n  transition: background 0.2s ease;\n}\n.glass-card {\n  background: var(--glass-bg-light);\n  border: 1px solid var(--glass-border-light);\n  border-radius: 12px;\n  backdrop-filter: blur(calc(var(--glass-blur) + 5px));\n  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 5px));\n  box-shadow: 0 4px 30px rgba(0,0,0,0.1);\n  will-change: transform;\n}\nbody.glass-dark-mode {\n  background: var(--glass-bg-dark);\n  color: #fff;\n}\nbody.glass-dark-mode::before {\n  background: radial-gradient(circle at var(--glass-pos-x) var(--glass-pos-y), rgba(0,0,0,0.35), transparent 70%);\n}\nbody.glass-dark-mode .glass-card {\n  background: var(--glass-bg-dark);\n  border: 1px solid var(--glass-border-dark);\n  box-shadow: 0 4px 30px rgba(0,0,0,0.6);\n}\n#glass-pro-panel input[type=range] {\n  width: 160px;\n}\n",
+    "template": ""
+  },
+  "dependencies": [],
+  "permissions": [],
+  "config": {},
+  "status": "inactive"
+}
