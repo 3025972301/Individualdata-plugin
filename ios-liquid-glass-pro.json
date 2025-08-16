@@ -1,0 +1,16 @@
+{
+  "id": "ios-liquid-glass-pro",
+  "name": "iOS液态玻璃Pro",
+  "version": "1.0.0",
+  "description": "精细优化的iOS液态玻璃全局主题，去除粉色块并提升性能",
+  "type": "theme",
+  "author": "ios-liquid-glass-dev",
+  "code": {
+    "js": "(() => { const m = window.matchMedia('(prefers-color-scheme: dark)'); const apply = e => document.body.classList.toggle('glass-dark', e.matches); apply(m); m.addEventListener('change', apply); console.log('iOS液态玻璃Pro主题已加载'); })();",
+    "css": ":root{\n  --glass-blur:20px;\n  --glass-bg:rgba(255,255,255,0.4);\n  --glass-border:rgba(255,255,255,0.4);\n  --glass-bg-dark:rgba(0,0,0,0.3);\n  --glass-border-dark:rgba(255,255,255,0.1);\n}\nbody{\n  background:linear-gradient(135deg,#a0c1ff 0%,#f6f9ff 100%);\n  min-height:100vh;\n  transition:background-color .3s;\n}\nbody.glass-dark{\n  background:linear-gradient(135deg,#0f2027 0%,#203a43 100%);\n}\n#app,.v-main,.container,.v-card,.v-sheet,.v-dialog .v-card,.v-navigation-drawer,.v-app-bar{\n  background:var(--glass-bg) !important;\n  backdrop-filter:blur(var(--glass-blur)) saturate(180%);\n  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(180%);\n  border:1px solid var(--glass-border);\n  border-radius:16px !important;\n  box-shadow:0 8px 32px rgba(31,38,135,.25);\n  transition:background .3s,border-color .3s;\n}\nbody.glass-dark #app,body.glass-dark .v-main,body.glass-dark .container,body.glass-dark .v-card,body.glass-dark .v-sheet,body.glass-dark .v-dialog .v-card,body.glass-dark .v-navigation-drawer,body.glass-dark .v-app-bar{\n  background:var(--glass-bg-dark) !important;\n  border-color:var(--glass-border-dark) !important;\n  box-shadow:0 8px 32px rgba(0,0,0,.45) !important;\n}\n.v-btn{\n  background:rgba(255,255,255,.25) !important;\n  border:1px solid var(--glass-border) !important;\n  backdrop-filter:blur(10px) !important;\n  -webkit-backdrop-filter:blur(10px) !important;\n  transition:background .3s !important;\n}\nbody.glass-dark .v-btn{\n  background:rgba(255,255,255,.1) !important;\n  border-color:var(--glass-border-dark) !important;\n}\nbody.glass-disabled,body.glass-disabled *{\n  backdrop-filter:none !important;\n  -webkit-backdrop-filter:none !important;\n}\n"
+  },
+  "dependencies": [],
+  "permissions": [],
+  "config": {},
+  "status": "inactive"
+}
