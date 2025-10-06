@@ -1,0 +1,16 @@
+{
+  "id": "simple-test",
+  "name": "简单测试",
+  "version": "1.0.0",
+  "description": "测试插件系统",
+  "author": "测试",
+  "type": "function",
+  "status": "active",
+  "permissions": [],
+
+  "code": {
+    "js": "console.log('测试插件已加载'); console.log('$pluginAPI:', typeof $pluginAPI); if (typeof $pluginAPI !== 'undefined') { console.log('✅ $pluginAPI 可用'); setTimeout(function() { console.log('准备添加悬浮按钮...'); $pluginAPI.system.addFloatButton({ id: 'test-float', title: '测试按钮', icon: 'mdi-test-tube', color: '#FF5722', onClick: function() { alert('测试按钮被点击！'); } }); console.log('✅ 测试悬浮按钮已添加'); }, 2000); } else { console.error('❌ $pluginAPI 不可用'); }",
+    "css": "",
+    "html": ""
+  }
+}

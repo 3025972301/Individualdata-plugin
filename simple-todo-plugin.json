@@ -1,0 +1,61 @@
+{
+  "id": "simple-todo-list",
+  "name": "简单待办事项",
+  "version": "1.0.0",
+  "description": "一个简单的待办事项管理插件，展示Vue组件插件的基本功能",
+  "author": "个体数据团队",
+  "type": "component",
+  "status": "active",
+  "permissions": [],
+  
+  "code": {
+    "css": ".todo-container { padding: 20px; } .todo-item { padding: 10px; margin: 5px 0; border-radius: 8px; transition: all 0.3s; } .todo-item:hover { transform: translateX(5px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); } .completed-task { text-decoration: line-through; opacity: 0.6; }",
+    "js": "(function() { console.log('简单待办事项插件已加载'); if (typeof $pluginAPI === 'undefined') { console.error('插件API未找到'); return; } var buttonInjected = false; function findDistributeContainer() { var allButtons = document.querySelectorAll('.v-btn'); for (var i = 0; i < allButtons.length; i++) { if (allButtons[i].textContent && allButtons[i].textContent.includes('顶端测试')) { return allButtons[i].parentElement; } } return null; } function createTodoButton() { var btnWrapper = document.createElement('div'); btnWrapper.id = 'plugin-todo-button-wrapper'; btnWrapper.style.display = 'inline-block'; btnWrapper.style.marginLeft = '8px'; var btn = document.createElement('button'); btn.className = 'v-btn v-btn--density-default v-btn--size-default v-btn--variant-elevated'; btn.style.cssText = 'background-color: rgb(25, 118, 210); color: white;'; btn.onclick = function() { if (window.$router) { window.$router.push('/plugin/todo'); } else { window.location.href = '/plugin/todo'; } }; var btnContent = document.createElement('span'); btnContent.className = 'v-btn__content'; var icon = document.createElement('i'); icon.className = 'mdi mdi-format-list-checks v-icon v-icon--size-default'; icon.style.marginRight = '4px'; btnContent.appendChild(icon); btnContent.appendChild(document.createTextNode('待办事项')); btn.appendChild(btnContent); btnWrapper.appendChild(btn); return btnWrapper; } function injectButton() { if (buttonInjected) { var existingBtn = document.getElementById('plugin-todo-button-wrapper'); if (existingBtn) { return; } else { buttonInjected = false; } } var targetContainer = findDistributeContainer(); if (targetContainer) { var existingBtn = document.getElementById('plugin-todo-button-wrapper'); if (existingBtn) { existingBtn.remove(); } var btnElement = createTodoButton(); targetContainer.appendChild(btnElement); buttonInjected = true; console.log('✅ 待办事项按钮已注入到 distribute.vue'); } } function tryInject() { setTimeout(function() { injectButton(); }, 500); setTimeout(function() { injectButton(); }, 1000); setTimeout(function() { injectButton(); }, 2000); } $pluginAPI.system.addFloatButton({ id: 'todo-float-btn', title: '待办事项', icon: 'mdi-format-list-checks', color: '#1976D2', onClick: function() { if (window.$router) { window.$router.push('/plugin/todo'); } else { window.location.href = '/plugin/todo'; } } }); console.log('✅ 待办事项悬浮按钮已添加'); tryInject(); if (window.$router) { var router = window.$router; var unwatch = router.afterEach(function(to, from) { console.log('路由变化，尝试注入按钮...'); setTimeout(function() { injectButton(); }, 300); setTimeout(function() { injectButton(); }, 800); }); console.log('✅ 路由监听已设置'); } else { console.warn('⚠️ 未找到路由器，无法监听路由变化'); } var observer = new MutationObserver(function(mutations) { if (!buttonInjected) { injectButton(); } }); observer.observe(document.body, { childList: true, subtree: true }); console.log('✅ DOM监听已设置'); })();"
+  },
+  
+  "component": {
+    "template": "<v-container class='todo-container'><v-card elevation='4'><v-toolbar color='primary' dark><v-toolbar-title><v-icon left>mdi-format-list-checks</v-icon> 我的待办事项</v-toolbar-title><v-spacer></v-spacer><v-badge :content='incompleteTasks' :value='incompleteTasks > 0' color='red' overlap><v-icon>mdi-bell</v-icon></v-badge></v-toolbar><v-card-text><v-text-field v-model='newTask' label='添加新任务' placeholder='输入任务内容...' outlined dense append-icon='mdi-plus-circle' @keyup.enter='addTask' @click:append='addTask' class='mb-4'></v-text-field><v-divider></v-divider><v-list v-if='tasks.length > 0'><v-list-item v-for='(task, index) in tasks' :key='task.id' class='todo-item'><v-list-item-action><v-checkbox v-model='task.completed' @change='updateTask(task)' color='success'></v-checkbox></v-list-item-action><v-list-item-content><v-list-item-title :class=\"{'completed-task': task.completed}\">{{ task.text }}</v-list-item-title><v-list-item-subtitle>创建于: {{ formatDate(task.createdAt) }}</v-list-item-subtitle></v-list-item-content><v-list-item-action><v-btn icon small color='error' @click='deleteTask(index)'><v-icon small>mdi-delete</v-icon></v-btn></v-list-item-action></v-list-item></v-list><v-alert v-else type='info' outlined>暂无待办事项，添加一个吧！</v-alert><v-divider class='my-4'></v-divider><v-row><v-col cols='6'><v-chip color='success' outlined><v-icon left small>mdi-check</v-icon>已完成: {{ completedTasks }}</v-chip></v-col><v-col cols='6' class='text-right'><v-chip color='warning' outlined><v-icon left small>mdi-clock</v-icon>待完成: {{ incompleteTasks }}</v-chip></v-col></v-row></v-card-text><v-card-actions><v-btn text color='error' @click='clearCompleted' :disabled='completedTasks === 0'><v-icon left>mdi-delete-sweep</v-icon>清除已完成</v-btn><v-spacer></v-spacer><v-btn text color='primary' @click='clearAll' :disabled='tasks.length === 0'><v-icon left>mdi-delete-forever</v-icon>清空全部</v-btn></v-card-actions></v-card></v-container>",
+    
+    "data": {
+      "newTask": "",
+      "tasks": []
+    },
+    
+    "computed": {
+      "completedTasks": "function() { return this.tasks.filter(t => t.completed).length; }",
+      "incompleteTasks": "function() { return this.tasks.filter(t => !t.completed).length; }"
+    },
+    
+    "methods": {
+      "addTask": "function() { if (this.newTask.trim()) { this.tasks.push({ id: Date.now(), text: this.newTask.trim(), completed: false, createdAt: new Date() }); this.saveTasks(); this.newTask = ''; this.showNotification('任务已添加', 'success'); } }",
+      "deleteTask": "function(index) { this.tasks.splice(index, 1); this.saveTasks(); this.showNotification('任务已删除', 'info'); }",
+      "updateTask": "function(task) { this.saveTasks(); this.showNotification(task.completed ? '任务已完成' : '任务标记为未完成', 'info'); }",
+      "clearCompleted": "function() { this.tasks = this.tasks.filter(t => !t.completed); this.saveTasks(); this.showNotification('已清除完成的任务', 'success'); }",
+      "clearAll": "function() { if (confirm('确定要清空所有任务吗？')) { this.tasks = []; this.saveTasks(); this.showNotification('所有任务已清空', 'warning'); } }",
+      "saveTasks": "function() { localStorage.setItem('plugin-todo-tasks', JSON.stringify(this.tasks)); }",
+      "loadTasks": "function() { const saved = localStorage.getItem('plugin-todo-tasks'); if (saved) { try { this.tasks = JSON.parse(saved); } catch(e) { this.tasks = []; } } }",
+      "formatDate": "function(date) { const d = new Date(date); return d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'}); }",
+      "showNotification": "function(msg, type) { if (window.$snackbar) { window.$snackbar(msg, 2000, type); } }"
+    },
+    
+    "mounted": "function() { this.loadTasks(); console.log('待办事项组件已挂载'); }"
+  },
+  
+  "route": {
+    "path": "/plugin/todo",
+    "name": "PluginTodo",
+    "title": "待办事项",
+    "icon": "mdi-format-list-checks"
+  },
+  
+  "menu": {
+    "title": "待办事项",
+    "icon": "mdi-format-list-checks",
+    "order": 50
+  },
+  
+  "config": {
+    "autoSave": true,
+    "maxTasks": 100
+  }
+}

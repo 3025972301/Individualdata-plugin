@@ -1,0 +1,89 @@
+{
+  "id": "aero-glass-theme-1733500000000abc",
+  "name": "Windows Aero 毛玻璃主题",
+  "description": "模拟 Windows 7 Aero Glass 效果的主题插件，提供毛玻璃质感、半透明窗口、动态光影效果和流畅动画。支持统一配置系统。",
+  "author": "Claude",
+  "version": "2.0.0",
+  "type": "theme",
+  "status": "active",
+  "dependencies": [],
+  "permissions": [
+    "system.notification",
+    "data.store"
+  ],
+  "config": {
+    "glassOpacity": 0.7,
+    "blurAmount": 20,
+    "reflectionIntensity": 0.3,
+    "animationSpeed": "normal",
+    "colorScheme": "blue",
+    "settingsSchema": {
+      "colorScheme": {
+        "type": "select",
+        "label": "配色方案",
+        "description": "选择主题的配色方案",
+        "options": [
+          { "label": "天蓝色（经典）", "value": "blue" },
+          { "label": "翠绿色", "value": "green" },
+          { "label": "紫罗兰", "value": "purple" },
+          { "label": "橙黄色", "value": "orange" }
+        ]
+      },
+      "glassOpacity": {
+        "type": "slider",
+        "label": "透明度",
+        "description": "调节毛玻璃效果的透明度",
+        "min": 0.3,
+        "max": 0.95,
+        "step": 0.05,
+        "format": "percentage",
+        "thumbLabel": true
+      },
+      "blurAmount": {
+        "type": "slider",
+        "label": "模糊度",
+        "description": "调节背景模糊程度",
+        "min": 5,
+        "max": 40,
+        "step": 1,
+        "format": "pixels",
+        "thumbLabel": true
+      },
+      "reflectionIntensity": {
+        "type": "slider",
+        "label": "光泽强度",
+        "description": "调节玻璃表面的反光效果强度",
+        "min": 0,
+        "max": 1,
+        "step": 0.05,
+        "format": "percentage",
+        "thumbLabel": true
+      },
+      "animationSpeed": {
+        "type": "select",
+        "label": "动画速度",
+        "description": "设置过渡动画的速度",
+        "options": [
+          { "label": "快速", "value": "fast" },
+          { "label": "正常", "value": "normal" },
+          { "label": "缓慢", "value": "slow" }
+        ]
+      },
+      "enableMouseTracking": {
+        "type": "boolean",
+        "label": "启用鼠标跟踪效果",
+        "description": "光标移动时显示动态光影效果"
+      },
+      "autoEnhanceElements": {
+        "type": "boolean",
+        "label": "自动增强界面元素",
+        "description": "自动为卡片、对话框等元素添加毛玻璃效果"
+      }
+    }
+  },
+  "code": {
+    "js": "(function() {\n  'use strict';\n  \n  const AeroTheme = {\n    // 默认配置\n    defaultConfig: {\n      glassOpacity: 0.7,\n      blurAmount: 20,\n      reflectionIntensity: 0.3,\n      animationSpeed: 'normal',\n      colorScheme: 'blue',\n      enableMouseTracking: true,\n      autoEnhanceElements: true\n    },\n    \n    config: null,\n    \n    colorSchemes: {\n      blue: {\n        primary: 'rgba(173, 216, 230, 0.7)',\n        secondary: 'rgba(135, 206, 235, 0.7)',\n        accent: 'rgba(100, 149, 237, 0.7)',\n        background: 'rgba(240, 248, 255, 0.85)'\n      },\n      green: {\n        primary: 'rgba(152, 251, 152, 0.7)',\n        secondary: 'rgba(144, 238, 144, 0.7)',\n        accent: 'rgba(60, 179, 113, 0.7)',\n        background: 'rgba(240, 255, 240, 0.85)'\n      },\n      purple: {\n        primary: 'rgba(221, 160, 221, 0.7)',\n        secondary: 'rgba(218, 112, 214, 0.7)',\n        accent: 'rgba(147, 112, 219, 0.7)',\n        background: 'rgba(248, 240, 255, 0.85)'\n      },\n      orange: {\n        primary: 'rgba(255, 218, 185, 0.7)',\n        secondary: 'rgba(255, 160, 122, 0.7)',\n        accent: 'rgba(255, 127, 80, 0.7)',\n        background: 'rgba(255, 250, 240, 0.85)'\n      }\n    },\n    \n    observer: null,\n    \n    init() {\n      console.log('Aero Glass 主题插件 v2.0 已加载');\n      \n      // 加载保存的配置\n      this.loadConfig();\n      \n      // 监听配置更新事件\n      window.addEventListener('plugin-settings-updated', (e) => {\n        if (e.detail.pluginId === 'aero-glass-theme-1733500000000abc') {\n          console.log('收到配置更新:', e.detail.settings);\n          this.config = { ...this.defaultConfig, ...e.detail.settings };\n          this.applyTheme();\n          if (this.config.autoEnhanceElements) {\n            this.enhanceElements();\n          }\n        }\n      });\n      \n      // 应用主题\n      this.applyTheme();\n      \n      // 添加动态效果\n      if (this.config.autoEnhanceElements) {\n        this.addDynamicEffects();\n      }\n      \n      // 添加窗口效果\n      if (this.config.enableMouseTracking) {\n        this.setupWindowEffects();\n      }\n    },\n    \n    // 加载配置\n    loadConfig() {\n      const saved = localStorage.getItem('plugin-settings-aero-glass-theme-1733500000000abc');\n      if (saved) {\n        try {\n          this.config = { ...this.defaultConfig, ...JSON.parse(saved) };\n          console.log('已加载保存的配置:', this.config);\n        } catch (e) {\n          console.error('配置加载失败，使用默认配置:', e);\n          this.config = { ...this.defaultConfig };\n        }\n      } else {\n        this.config = { ...this.defaultConfig };\n      }\n    },\n    \n    // 应用主题\n    applyTheme() {\n      const scheme = this.colorSchemes[this.config.colorScheme];\n      const root = document.documentElement;\n      \n      // 设置CSS变量\n      root.style.setProperty('--aero-primary', scheme.primary);\n      root.style.setProperty('--aero-secondary', scheme.secondary);\n      root.style.setProperty('--aero-accent', scheme.accent);\n      root.style.setProperty('--aero-background', scheme.background);\n      root.style.setProperty('--aero-blur', `${this.config.blurAmount}px`);\n      root.style.setProperty('--aero-opacity', this.config.glassOpacity);\n      root.style.setProperty('--aero-reflection', this.config.reflectionIntensity);\n      \n      // 设置动画速度\n      const speed = this.config.animationSpeed === 'fast' ? '0.2s' : \n                    this.config.animationSpeed === 'slow' ? '0.6s' : '0.4s';\n      root.style.setProperty('--aero-transition-speed', speed);\n      \n      // 添加主题类名\n      document.body.classList.add('aero-theme-active');\n      \n      console.log(`Aero主题已应用: ${this.config.colorScheme}`);\n    },\n    \n    // 添加动态效果\n    addDynamicEffects() {\n      // 停止旧的观察器\n      if (this.observer) {\n        this.observer.disconnect();\n      }\n      \n      // 为所有卡片添加悬停效果\n      this.observer = new MutationObserver(() => {\n        this.enhanceElements();\n      });\n      \n      this.observer.observe(document.body, {\n        childList: true,\n        subtree: true\n      });\n      \n      this.enhanceElements();\n    },\n    \n    // 增强元素效果\n    enhanceElements() {\n      if (!this.config.autoEnhanceElements) return;\n      \n      // 增强卡片\n      const cards = document.querySelectorAll('.v-card:not(.aero-enhanced)');\n      cards.forEach(card => {\n        card.classList.add('aero-enhanced', 'aero-glass');\n      });\n      \n      // 增强对话框\n      const dialogs = document.querySelectorAll('.v-dialog .v-card:not(.aero-enhanced)');\n      dialogs.forEach(dialog => {\n        dialog.classList.add('aero-enhanced', 'aero-glass-dialog');\n      });\n      \n      // 增强导航栏\n      const navs = document.querySelectorAll('.v-navigation-drawer:not(.aero-enhanced)');\n      navs.forEach(nav => {\n        nav.classList.add('aero-enhanced', 'aero-glass-nav');\n      });\n      \n      // 增强应用栏\n      const appBars = document.querySelectorAll('.v-app-bar:not(.aero-enhanced)');\n      appBars.forEach(bar => {\n        bar.classList.add('aero-enhanced', 'aero-glass-bar');\n      });\n    },\n    \n    // 设置窗口效果\n    setupWindowEffects() {\n      if (!this.config.enableMouseTracking) return;\n      \n      // 创建光标跟随效果\n      let mouseX = 0, mouseY = 0;\n      \n      document.addEventListener('mousemove', (e) => {\n        mouseX = e.clientX;\n        mouseY = e.clientY;\n        \n        // 更新光影位置\n        const glassElements = document.querySelectorAll('.aero-glass');\n        glassElements.forEach(el => {\n          const rect = el.getBoundingClientRect();\n          const centerX = rect.left + rect.width / 2;\n          const centerY = rect.top + rect.height / 2;\n          \n          const deltaX = (mouseX - centerX) / rect.width;\n          const deltaY = (mouseY - centerY) / rect.height;\n          \n          el.style.setProperty('--mouse-x', deltaX);\n          el.style.setProperty('--mouse-y', deltaY);\n        });\n      });\n    }\n  };\n  \n  // 全局暴露\n  window.aeroTheme = AeroTheme;\n  \n  // 初始化\n  AeroTheme.init();\n})();",
+    "css": "/* Aero Glass 主题样式 v2.0 */\n\n/* CSS变量定义 */\n:root {\n  --aero-primary: rgba(173, 216, 230, 0.7);\n  --aero-secondary: rgba(135, 206, 235, 0.7);\n  --aero-accent: rgba(100, 149, 237, 0.7);\n  --aero-background: rgba(240, 248, 255, 0.85);\n  --aero-blur: 20px;\n  --aero-opacity: 0.7;\n  --aero-reflection: 0.3;\n  --aero-transition-speed: 0.4s;\n  --mouse-x: 0;\n  --mouse-y: 0;\n}\n\n/* 全局背景 */\nbody.aero-theme-active {\n  background: linear-gradient(135deg, \n    rgba(173, 216, 230, 0.3) 0%, \n    rgba(135, 206, 235, 0.2) 50%, \n    rgba(100, 149, 237, 0.3) 100%);\n  background-attachment: fixed;\n}\n\n/* 毛玻璃效果基类 */\n.aero-glass {\n  position: relative;\n  background: var(--aero-background) !important;\n  backdrop-filter: blur(var(--aero-blur)) saturate(180%);\n  -webkit-backdrop-filter: blur(var(--aero-blur)) saturate(180%);\n  border: 1px solid rgba(255, 255, 255, 0.3) !important;\n  box-shadow: \n    0 8px 32px 0 rgba(31, 38, 135, 0.15),\n    inset 0 1px 0 0 rgba(255, 255, 255, 0.5),\n    inset 0 -1px 0 0 rgba(0, 0, 0, 0.1) !important;\n  transition: all var(--aero-transition-speed) cubic-bezier(0.4, 0, 0.2, 1);\n  overflow: hidden;\n}\n\n/* 玻璃反光效果 */\n.aero-glass::before {\n  content: '';\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background: linear-gradient(\n    135deg,\n    rgba(255, 255, 255, calc(var(--aero-reflection) * 0.6)) 0%,\n    transparent 50%,\n    rgba(0, 0, 0, calc(var(--aero-reflection) * 0.3)) 100%\n  );\n  pointer-events: none;\n  opacity: 0.6;\n  transition: opacity var(--aero-transition-speed);\n}\n\n/* 光标响应效果 */\n.aero-glass::after {\n  content: '';\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background: radial-gradient(\n    circle at calc(50% + var(--mouse-x) * 100px) calc(50% + var(--mouse-y) * 100px),\n    rgba(255, 255, 255, 0.15),\n    transparent 60%\n  );\n  pointer-events: none;\n  opacity: 0;\n  transition: opacity 0.3s;\n}\n\n.aero-glass:hover::after {\n  opacity: 1;\n}\n\n/* 卡片悬停效果 */\n.aero-glass:hover {\n  transform: translateY(-4px) scale(1.02);\n  box-shadow: \n    0 16px 48px 0 rgba(31, 38, 135, 0.25),\n    inset 0 1px 0 0 rgba(255, 255, 255, 0.6),\n    inset 0 -1px 0 0 rgba(0, 0, 0, 0.1) !important;\n  border-color: rgba(255, 255, 255, 0.5) !important;\n}\n\n/* 对话框样式 */\n.aero-glass-dialog {\n  background: var(--aero-background) !important;\n  backdrop-filter: blur(calc(var(--aero-blur) * 1.5)) saturate(200%);\n  -webkit-backdrop-filter: blur(calc(var(--aero-blur) * 1.5)) saturate(200%);\n  box-shadow: \n    0 20px 60px 0 rgba(31, 38, 135, 0.3),\n    inset 0 2px 0 0 rgba(255, 255, 255, 0.6) !important;\n}\n\n/* 导航栏样式 */\n.aero-glass-nav {\n  background: var(--aero-primary) !important;\n  backdrop-filter: blur(var(--aero-blur)) saturate(180%);\n  -webkit-backdrop-filter: blur(var(--aero-blur)) saturate(180%);\n  border-right: 1px solid rgba(255, 255, 255, 0.3) !important;\n}\n\n/* 应用栏样式 */\n.aero-glass-bar {\n  background: var(--aero-secondary) !important;\n  backdrop-filter: blur(var(--aero-blur)) saturate(180%);\n  -webkit-backdrop-filter: blur(var(--aero-blur)) saturate(180%);\n  border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;\n}\n\n/* 响应式设计 */\n@media (max-width: 768px) {\n  .aero-glass {\n    backdrop-filter: blur(calc(var(--aero-blur) * 0.8)) saturate(150%);\n    -webkit-backdrop-filter: blur(calc(var(--aero-blur) * 0.8)) saturate(150%);\n  }\n}\n\n/* 暗色模式适配 */\n@media (prefers-color-scheme: dark) {\n  body.aero-theme-active {\n    background: linear-gradient(135deg, \n      rgba(30, 30, 60, 0.9) 0%, \n      rgba(20, 20, 50, 0.9) 50%, \n      rgba(10, 10, 40, 0.9) 100%);\n  }\n  \n  .aero-glass {\n    background: rgba(40, 40, 80, 0.7) !important;\n    border-color: rgba(255, 255, 255, 0.15) !important;\n  }\n}\n\n/* 辅助功能 */\n@media (prefers-reduced-motion: reduce) {\n  .aero-glass,\n  .aero-glass::before,\n  .aero-glass::after {\n    transition: none !important;\n    animation: none !important;\n  }\n}\n\n/* 高对比度模式 */\n@media (prefers-contrast: high) {\n  .aero-glass {\n    border-width: 2px !important;\n    border-color: rgba(0, 0, 0, 0.5) !important;\n  }\n}",
+    "html": ""
+  }
+}
