@@ -16,7 +16,8 @@
 9. [生命周期与钩子](#生命周期与钩子)
 10. [安全策略与权限](#安全策略与权限)
 11. [调试与排错清单](#调试与排错清单)
-12. [最佳实践与 AI 提示词模板](#最佳实践与-ai-提示词模板)
+12. [插件配置与全局设置](#插件配置与全局设置)
+13. [最佳实践与 AI 提示词模板](#最佳实践与-ai-提示词模板)
 
 ---
 
@@ -169,8 +170,82 @@
 2. **检查全局扩展初始化**：控制台应看到 `🔌 全局插件扩展系统已初始化`，并能在 DOM 中找到 `plugin-float-buttons`/`plugin-widgets`/`plugin-modals` 容器。
 3. **验证 `$pluginAPI`**：在控制台执行 `window.app?.config?.globalProperties?.$pluginManager?.pluginAPI`，应返回包含 `system/data/utils` 等字段的对象。
 4. **手动注入测试按钮**：通过 `window.$pluginExtension.addFloatButton` 验证扩展系统是否可用。
-5. **常见问题与解决方案**：参考调试文档中的“没有日志”“悬浮按钮缺失”“GlobalPluginExtension 未初始化”“component 的 code.js 不执行”等条目，按步骤排查接口返回、导入顺序或插件配置。
+5. **常见问题与解决方案**：参考调试文档中的"没有日志""悬浮按钮缺失""GlobalPluginExtension 未初始化""component 的 code.js 不执行"等条目，按步骤排查接口返回、导入顺序或插件配置。
 6. **测试插件**：仓库自带 `simple-test` 等测试插件，可通过接口 `plugin_gateway` 检查加载状态。
+
+## 插件配置与全局设置
+
+### 全局配置存储
+- 插件配置现在统一存储在数据库中，实现全局生效，不再使用本地缓存
+- 所有用户访问网站时都会看到相同的插件配置，确保一致性
+- 配置修改会立即同步到数据库，并通知所有活跃的插件实例
+
+### 配置架构
+```json
+{
+  "config": {
+    "enabled": true,
+    "intensity": 0.6,
+    "transitionSpeed": "normal",
+    "settingsSchema": {
+      "enabled": {
+        "type": "boolean",
+        "label": "启用功能",
+        "description": "开启或关闭此功能"
+      },
+      "intensity": {
+        "type": "slider",
+        "label": "强度",
+        "min": 0.1,
+        "max": 1,
+        "step": 0.1
+      }
+    }
+  }
+}
+```
+
+### 插件代码访问配置
+在插件 JavaScript 代码中，可以通过以下方式访问全局配置：
+
+```javascript
+// 方法1：通过 $plugin.config 访问（推荐）
+if ($plugin && $plugin.config) {
+  this.config = { ...this.config, ...$plugin.config };
+}
+
+// 方法2：监听配置更新事件
+window.addEventListener('plugin-settings-updated', (e) => {
+  if (e.detail.pluginId === 'your-plugin-id') {
+    this.config = { ...this.config, ...e.detail.settings };
+    // 重新应用配置
+    this.applySettings();
+  }
+});
+```
+
+### 配置界面
+- 通过 `PluginSettingsDialog` 组件提供用户友好的配置界面
+- 支持多种配置字段类型：文本、数字、布尔值、下拉选择、滑块、颜色选择器、文本域、多选框组
+- 配置修改实时保存到数据库，无需手动提交
+- 提供高级选项：恢复默认设置、JSON 编辑器
+
+### 配置字段类型
+| 类型 | 用途 | 示例 |
+|------|------|------|
+| `boolean` | 开关选项 | 启用/禁用功能 |
+| `text` | 文本输入 | 标题、描述 |
+| `number` | 数字输入 | 数量、阈值 |
+| `select` | 下拉选择 | 速度选项 |
+| `slider` | 滑块控件 | 强度、透明度 |
+| `color` | 颜色选择 | 主题颜色 |
+| `textarea` | 多行文本 | 长描述、配置说明 |
+| `checkbox-group` | 多选框组 | 功能模块选择 |
+
+### 向后兼容性
+- 现有插件无需修改即可继续使用
+- 新插件建议使用全局配置存储
+- 系统会自动处理配置的加载和更新
 
 ## 最佳实践与 AI 提示词模板
 - **唯一命名**：`id`、DOM 容器、事件名称请保持唯一，避免与其他插件冲突。
