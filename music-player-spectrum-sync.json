@@ -1,0 +1,82 @@
+{
+  "id": "music-player-spectrum-sync-1733600000000",
+  "name": "音乐播放器频谱色彩同步",
+  "description": "让音乐播放器页面的所有组件颜色跟随频谱颜色动态变化，带来沉浸式的视听体验。支持自定义强度、速度和影响范围。",
+  "author": "Claude",
+  "version": "1.2.0",
+  "type": "function",
+  "status": "active",
+  "dependencies": [],
+  "permissions": [
+    "system.notification",
+    "data.store"
+  ],
+  "config": {
+    "enabled": true,
+    "intensity": 0.6,
+    "transitionSpeed": "fast",
+    "affectCards": true,
+    "affectButtons": true,
+    "affectProgress": true,
+    "affectBackground": true,
+    "pulseOnBeat": true,
+    "settingsSchema": {
+      "enabled": {
+        "type": "boolean",
+        "label": "启用频谱色彩同步",
+        "description": "开启后，页面颜色将跟随音乐频谱变化"
+      },
+      "intensity": {
+        "type": "slider",
+        "label": "颜色强度",
+        "description": "控制颜色变化的强度",
+        "min": 0.1,
+        "max": 1,
+        "step": 0.1,
+        "format": "percentage",
+        "thumbLabel": true
+      },
+      "transitionSpeed": {
+        "type": "select",
+        "label": "过渡速度",
+        "description": "颜色变化的速度（快速=实时同步）",
+        "options": [
+          { "label": "实时同步", "value": "instant" },
+          { "label": "快速", "value": "fast" },
+          { "label": "正常", "value": "normal" },
+          { "label": "缓慢", "value": "slow" }
+        ]
+      },
+      "affectCards": {
+        "type": "boolean",
+        "label": "影响卡片组件",
+        "description": "卡片边框和背景会跟随频谱颜色"
+      },
+      "affectButtons": {
+        "type": "boolean",
+        "label": "影响按钮组件",
+        "description": "按钮颜色会跟随频谱颜色"
+      },
+      "affectProgress": {
+        "type": "boolean",
+        "label": "影响进度条",
+        "description": "进度条颜色会跟随频谱颜色"
+      },
+      "affectBackground": {
+        "type": "boolean",
+        "label": "影响页面背景",
+        "description": "页面背景会有微弱的颜色渐变"
+      },
+      "pulseOnBeat": {
+        "type": "boolean",
+        "label": "节奏脉冲效果",
+        "description": "在强节拍时产生脉冲动画"
+      }
+    }
+  },
+  "code": {
+    "js": "(function() {\n  'use strict';\n  \n  const isMusicPlayerPage = () => {\n    return window.location.pathname.startsWith('/!0');\n  };\n  \n  const SpectrumColorSync = {\n    config: {\n      enabled: true,\n      intensity: 0.6,\n      transitionSpeed: 'fast',\n      affectCards: true,\n      affectButtons: true,\n      affectProgress: true,\n      affectBackground: true,\n      pulseOnBeat: true\n    },\n    \n    currentColor: '#81D4FA',\n    lastAppliedColor: null,\n    observer: null,\n    styleElement: null,\n    isRunning: false,\n    colorChangeHandler: null,\n    animationFrameId: null,\n    \n    init() {\n      console.log('频谱色彩同步插件已加载 v1.2.0');\n      this.loadConfig();\n      \n      window.addEventListener('plugin-settings-updated', (e) => {\n        if (e.detail.pluginId === 'music-player-spectrum-sync-1733600000000') {\n          this.config = { ...this.config, ...e.detail.settings };\n          if (this.config.enabled && isMusicPlayerPage()) {\n            this.start();\n          } else {\n            this.stop();\n          }\n        }\n      });\n      \n      this.createStyleElement();\n      this.watchRoute();\n      \n      if (isMusicPlayerPage() && this.config.enabled) {\n        setTimeout(() => this.start(), 500);\n      }\n    },\n    \n    watchRoute() {\n      const handleRouteChange = () => {\n        setTimeout(() => {\n          if (isMusicPlayerPage() && this.config.enabled) {\n            this.start();\n          } else {\n            this.stop();\n          }\n        }, 300);\n      };\n      \n      window.addEventListener('popstate', handleRouteChange);\n      \n      const originalPushState = history.pushState;\n      const originalReplaceState = history.replaceState;\n      \n      history.pushState = function(...args) {\n        originalPushState.apply(history, args);\n        handleRouteChange();\n      };\n      \n      history.replaceState = function(...args) {\n        originalReplaceState.apply(history, args);\n        handleRouteChange();\n      };\n    },\n    \n    start() {\n      if (this.isRunning) return;\n      this.isRunning = true;\n      console.log('频谱色彩同步启动');\n      this.startColorSync();\n      this.observeDOM();\n    },\n    \n    stop() {\n      if (!this.isRunning) return;\n      this.isRunning = false;\n      console.log('频谱色彩同步停止');\n      this.cleanup();\n    },\n    \n    loadConfig() {\n      console.log('使用数据库存储的全局配置');\n    },\n    \n    createStyleElement() {\n      if (this.styleElement) return;\n      this.styleElement = document.createElement('style');\n      this.styleElement.id = 'spectrum-color-sync-styles';\n      document.head.appendChild(this.styleElement);\n    },\n    \n    startColorSync() {\n      // 监听频谱颜色变化事件\n      this.colorChangeHandler = (e) => {\n        if (!this.isRunning || !e.detail || !e.detail.color) return;\n        this.updateColor(e.detail.color);\n      };\n      \n      window.addEventListener('spectrum-color-change', this.colorChangeHandler);\n\n      // 使用 requestAnimationFrame 进行更高频率的颜色监听\n      if (this.config.transitionSpeed === 'instant') {\n        const checkColorUpdate = () => {\n          if (!this.isRunning) return;\n          const root = document.documentElement;\n          const currentCSSColor = getComputedStyle(root).getPropertyValue('--aero-primary').trim();\n          if (currentCSSColor && currentCSSColor !== this.lastAppliedColor) {\n            this.currentColor = currentCSSColor;\n            this.lastAppliedColor = currentCSSColor;\n            this.applyColors();\n          }\n          this.animationFrameId = requestAnimationFrame(checkColorUpdate);\n        };\n        checkColorUpdate();\n      }\n\n      // 初始化时应用一次\n      const root = document.documentElement;\n      const initialColor = getComputedStyle(root).getPropertyValue('--aero-primary').trim();\n      if (initialColor) {\n        this.currentColor = initialColor;\n        this.lastAppliedColor = initialColor;\n        this.applyColors();\n      }\n    },\n    \n    // 暴露给频谱渲染直接调用的同步更新函数\n    updateColor(newColor) {\n      if (!this.isRunning || !newColor) return;\n      \n      // 避免重复应用相同的颜色\n      if (newColor === this.lastAppliedColor) return;\n      \n      this.currentColor = newColor;\n      this.lastAppliedColor = newColor;\n      this.applyColors();\n    },\n    \n    applyColors() {\n      if (!this.config.enabled || !this.styleElement) return;\n      \n      const color = this.currentColor;\n      const intensity = this.config.intensity;\n      const speed = this.getTransitionSpeed();\n      \n      const rgb = this.parseColor(color);\n      if (!rgb) return;\n      \n      const { r, g, b } = rgb;\n      \n      const colorLight = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + (0.1 * intensity) + ')';\n      const colorMedium = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + (0.3 * intensity) + ')';\n      const colorStrong = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + (0.6 * intensity) + ')';\n      \n      // 对于实时同步模式，完全禁用CSS过渡\n      // 对于快速模式，使用极短的过渡时间\n      const actualSpeed = speed;\n      \n      let styles = '\\n        /* 基础过渡设置 */\\n        .player-wrapper *:not(.lyric-line):not(.lyrics-container) {\\n          transition: ' + (actualSpeed === '0s' ? 'none' : 'border-color ' + actualSpeed + ', background-color ' + actualSpeed + ', box-shadow ' + actualSpeed + ', color ' + actualSpeed) + ' !important;\\n        }\\n      ';\n      \n      if (this.config.affectCards) {\n        styles += '\\n          .player-wrapper .v-card {\\n            border-color: ' + colorMedium + ' !important;\\n            box-shadow: 0 4px 20px ' + colorLight + ', inset 0 1px 0 ' + colorMedium + ' !important;\\n          }\\n          \\n          .player-wrapper .v-card:hover {\\n            box-shadow: 0 8px 30px ' + colorMedium + ', inset 0 1px 0 ' + colorStrong + ' !important;\\n          }\\n          \\n          .player-wrapper .playlist-item.active {\\n            background-color: ' + colorLight + ' !important;\\n            border-color: ' + colorMedium + ' !important;\\n            box-shadow: 0 0 20px ' + colorLight + ' !important;\\n          }\\n        ';\n      }\n      \n      if (this.config.affectButtons) {\n        styles += '\\n          .player-wrapper .v-btn--variant-elevated,\\n          .player-wrapper .v-btn--variant-flat {\\n            background: linear-gradient(135deg, ' + colorMedium + ', ' + colorLight + ') !important;\\n          }\\n          \\n          .player-wrapper .v-btn--variant-elevated:hover,\\n          .player-wrapper .v-btn--variant-flat:hover {\\n            background: linear-gradient(135deg, ' + colorStrong + ', ' + colorMedium + ') !important;\\n            box-shadow: 0 4px 15px ' + colorMedium + ' !important;\\n          }\\n          \\n          .player-wrapper .v-btn[color=\\\"primary\\\"] {\\n            background: ' + color + ' !important;\\n            box-shadow: 0 0 20px ' + colorMedium + ' !important;\\n          }\\n        ';\n      }\n      \n      if (this.config.affectProgress) {\n        styles += '\\n          /* Vuetify滑块整体组件 */\\n          .player-wrapper .v-slider {\\n            color: ' + color + ' !important;\\n          }\\n          \\n          /* 滑块已填充轨道 */\\n          .player-wrapper .v-slider .v-slider-track__fill {\\n            background-color: ' + color + ' !important;\\n          }\\n          \\n          /* 滑块背景轨道 */\\n          .player-wrapper .v-slider .v-slider-track__background {\\n            opacity: 0.3 !important;\\n            background-color: ' + colorMedium + ' !important;\\n          }\\n          \\n          /* 滑块拖动按钮 */\\n          .player-wrapper .v-slider .v-slider-thumb__surface {\\n            background-color: ' + color + ' !important;\\n            box-shadow: 0 0 10px ' + colorMedium + ' !important;\\n          }\\n          \\n          /* 兼容旧版Vuetify类名 */\\n          .player-wrapper .v-slider__track-fill {\\n            background: ' + color + ' !important;\\n          }\\n          \\n          .player-wrapper .v-slider__track-background {\\n            opacity: 0.3 !important;\\n            background: ' + colorLight + ' !important;\\n          }\\n          \\n          .player-wrapper .v-slider__thumb {\\n            background: ' + color + ' !important;\\n            box-shadow: 0 0 10px ' + colorMedium + ' !important;\\n          }\\n          \\n          /* 进度条 */\\n          .player-wrapper .v-progress-linear__determinate {\\n            background: linear-gradient(90deg, ' + colorLight + ', ' + color + ') !important;\\n          }\\n        ';\n      }\n      \n      if (this.config.affectBackground) {\n        styles += '\\n          .player-wrapper .player-container {\\n            background: radial-gradient(circle at 50% 50%, ' + colorLight + ', transparent 70%) !important;\\n          }\\n        ';\n      }\n      \n      styles += '\\n        .player-wrapper .lyric-line.active {\\n          color: ' + color + ' !important;\\n          text-shadow: 0 0 20px ' + colorMedium + ' !important;\\n        }\\n      ';\n      \n      if (this.config.pulseOnBeat) {\n        styles += '\\n          @keyframes spectrum-pulse {\\n            0% { transform: scale(1); box-shadow: 0 0 0 ' + colorMedium + '; }\\n            50% { transform: scale(1.05); box-shadow: 0 0 30px ' + colorStrong + '; }\\n            100% { transform: scale(1); box-shadow: 0 0 0 ' + colorMedium + '; }\\n          }\\n          \\n          .player-wrapper .spectrum-pulse {\\n            animation: spectrum-pulse 0.3s ease-out !important;\\n          }\\n        ';\n      }\n      \n      this.styleElement.textContent = styles;\n    },\n    \n    parseColor(color) {\n      if (color.startsWith('rgba') || color.startsWith('rgb')) {\n        const match = color.match(/\\d+/g);\n        if (match && match.length >= 3) {\n          return {\n            r: parseInt(match[0]),\n            g: parseInt(match[1]),\n            b: parseInt(match[2])\n          };\n        }\n      }\n      \n      if (color.startsWith('#')) {\n        const hex = color.replace('#', '');\n        return {\n          r: parseInt(hex.substring(0, 2), 16),\n          g: parseInt(hex.substring(2, 4), 16),\n          b: parseInt(hex.substring(4, 6), 16)\n        };\n      }\n      \n      return null;\n    },\n    \n    getTransitionSpeed() {\n      const speeds = {\n        instant: '0s',\n        fast: '0.05s',\n        normal: '0.3s',\n        slow: '0.6s'\n      };\n      return speeds[this.config.transitionSpeed] || speeds.fast;\n    },\n    \n    observeDOM() {\n      if (this.observer) return;\n      \n      this.observer = new MutationObserver(() => {\n        if (this.config.enabled && isMusicPlayerPage()) {\n          this.applyColors();\n        }\n      });\n      \n      this.observer.observe(document.body, {\n        childList: true,\n        subtree: true\n      });\n    },\n    \n    cleanup() {\n      if (this.styleElement) {\n        this.styleElement.textContent = '';\n      }\n      if (this.observer) {\n        this.observer.disconnect();\n        this.observer = null;\n      }\n      if (this.colorChangeHandler) {\n        window.removeEventListener('spectrum-color-change', this.colorChangeHandler);\n        this.colorChangeHandler = null;\n      }\n      if (this.animationFrameId) {\n        cancelAnimationFrame(this.animationFrameId);\n        this.animationFrameId = null;\n      }\n    }\n  };\n  \n  window.spectrumColorSync = SpectrumColorSync;\n  SpectrumColorSync.init();\n  \n  window.addEventListener('beforeunload', () => {\n    SpectrumColorSync.cleanup();\n  });\n})();",
+    "css": "/* 频谱色彩同步插件的基础样式 */\n\n.player-wrapper {\n  position: relative;\n}\n\n/* 为节奏脉冲做准备 */\n.player-wrapper .v-btn,\n.player-wrapper .v-card,\n.player-wrapper .playlist-item {\n  will-change: transform, box-shadow;\n}\n\n/* 保留歌词的原始动画 */\n.player-wrapper .lyric-line {\n  transition: all 0.3s ease !important;\n}\n\n.player-wrapper .lyric-line.active {\n  will-change: color, text-shadow, transform;\n}\n\n/* 保留歌词容器的淡入淡出动画 */\n.player-wrapper .lyrics-container {\n  transition: opacity 0.3s ease !important;\n}\n\n/* 确保颜色变化立即生效（实时同步模式） */\n.player-wrapper.instant-sync *:not(.lyric-line):not(.lyrics-container) {\n  transition: none !important;\n}\n\n.player-wrapper .v-btn[size=\"large\"] {\n  position: relative;\n  overflow: visible;\n}",
+    "html": ""
+  }
+}

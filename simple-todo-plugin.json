@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "一个简单的待办事项管理插件，展示Vue组件插件的基本功能",
   "author": "个体数据团队",
-  "type": "component",
+  "type": "page",
   "status": "active",
   "permissions": [],
   
@@ -52,6 +52,14 @@
     "title": "待办事项",
     "icon": "mdi-format-list-checks",
     "order": 50
+  },
+
+  "sidebar": {
+    "title": "待办事项",
+    "icon": "mdi-format-list-checks",
+    "subtitle": "管理您的任务",
+    "order": 50,
+    "to": "/plugin/todo"
   },
   
   "config": {

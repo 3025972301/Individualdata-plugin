@@ -1,0 +1,36 @@
+
+  "id": "sidebar-test-plugin",
+  "name": "侧边栏测试插件",
+  "version": "1.0.0",
+  "description": "测试插件侧边栏自定义功能",
+  "author": "测试团队",
+  "type": "page",
+  "status": "active",
+  "permissions": [],
+
+  "component": {
+    "template": "<v-container><v-card><v-card-title class='text-center'><v-icon color='primary' class='mr-2'>mdi-test-tube</v-icon>侧边栏测试页面</v-card-title><v-card-text><p class='text-body-1'>这是一个测试插件页面，用于验证侧边栏自定义功能。</p><v-alert type='success' class='mt-4'>✅ 侧边栏自定义功能测试成功！</v-alert></v-card-text></v-card></v-container>",
+    "data": {
+      "message": "侧边栏测试页面已加载"
+    },
+    "mounted": "function() { console.log('侧边栏测试页面已挂载'); this.$pluginAPI.system.showNotification('侧边栏测试页面已加载', 'success'); }"
+  },
+
+  "route": {
+    "path": "/plugin/sidebar-test",
+    "name": "PluginSidebarTest",
+    "title": "侧边栏测试",
+    "icon": "mdi-test-tube"
+  },
+
+  "sidebar": {
+    "title": "侧边栏测试",
+    "icon": "mdi-test-tube",
+    "subtitle": "测试插件侧边栏",
+    "order": 30
+  },
+
+  "config": {
+    "testMode": true
+  }
+}
